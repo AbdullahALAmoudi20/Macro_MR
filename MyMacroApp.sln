@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36221.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyMacroApp", "MyMacroApp\MyMacroApp.csproj", "{9A87054A-6B4D-40BA-AA13-A66A9AD571E7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A87054A-6B4D-40BA-AA13-A66A9AD571E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A87054A-6B4D-40BA-AA13-A66A9AD571E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A87054A-6B4D-40BA-AA13-A66A9AD571E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A87054A-6B4D-40BA-AA13-A66A9AD571E7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E4691E43-E24D-4BC2-BC6C-2B64C3A5F196}
+	EndGlobalSection
+EndGlobal

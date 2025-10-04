@@ -1,0 +1,44 @@
+﻿<Window x:Class="MacroMR.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MacroMR"
+        Title="Main Program" Height="500" Width="350"
+        Loaded="Window_Loaded">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="73*"/>
+            <ColumnDefinition Width="102*"/>
+        </Grid.ColumnDefinitions>
+        <!-- الخلفية -->
+        <Grid.Background>
+            <ImageBrush ImageSource="logo.png" Opacity="1.0"/>
+        </Grid.Background>
+
+        <!-- الصفحة الرئيسية -->
+        <StackPanel x:Name="HomePanel" VerticalAlignment="Center" HorizontalAlignment="Left" Width="250" Background="#AA000000" Margin="50,0,0,0" Orientation="Vertical" Grid.ColumnSpan="2">
+            <TextBlock Text="Macro Starter" FontSize="18" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+            <Button x:Name="StartMacroButton" Content="Start Macro" Click="StartMacro_Click" Margin="0,0,0,8"/>
+            <Button Content="Go to Settings" Click="OpenSettings_Click" Margin="0,0,0,8"/>
+
+            <!-- أزرار الدعم -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <Button Content="YouTube" Click="YouTube_Click" Width="100" Margin="5"/>
+                <Button Content="Discord" Click="Discord_Click" Width="100" Margin="5"/>
+            </StackPanel>
+
+            <!-- الحقوق بأسفل الصفحة -->
+            <StackPanel Orientation="Vertical" Margin="0,30,0,0" HorizontalAlignment="Center">
+                <TextBlock Text="© MARWAN"
+                           Foreground="White"
+                           FontWeight="Bold"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           Margin="0,0,0,3"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- التنقل بين الصفحات -->
+        <Frame x:Name="MainFrame" Visibility="Visible" Grid.ColumnSpan="2"/>
+    </Grid>
+</Window>
