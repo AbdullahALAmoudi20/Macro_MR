@@ -5,6 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
+using System.Reflection;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 
 namespace MacroMR
 {
@@ -56,11 +59,12 @@ namespace MacroMR
             _proc = HookCallback;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             LoadSettings();
             BumpPriority();
             this.Closed += Window_Closed;
+            await CheckForUpdates(); // Automatically check for updates on startup
         }
 
         private void Window_Closed(object? sender, EventArgs e)
@@ -88,14 +92,14 @@ namespace MacroMR
                 // We are on the UI thread, so no dispatcher needed.
                 if (string.IsNullOrWhiteSpace(CurrentConfig.TriggerKey))
                 {
-                    MessageBox.Show("❌ Cannot restart macro. Please set a valid Trigger Key in Settings.", "Error",
+                    MessageBox.Show("❌ لا يمكن إعادة تشغيل الماكرو. يرجى تعيين مفتاح تشغيل صالح في الإعدادات.", "خطأ",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
                 // The core "start" logic from StartMacro_Click
                 _hookID = SetHook(_proc);
                 isMacroRunning = true;
-                StartMacroButton.Content = "Stop Macro";
+                StartMacroButton.Content = "إيقاف الماكرو";
             }
         }
 
@@ -139,7 +143,7 @@ namespace MacroMR
 
             if (string.IsNullOrWhiteSpace(CurrentConfig.TriggerKey))
             {
-                MessageBox.Show("❌ Please set Trigger Key in Settings.", "Error",
+                MessageBox.Show("❌ يرجى تعيين مفتاح التشغيل في الإعدادات.", "خطأ",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
@@ -148,7 +152,7 @@ namespace MacroMR
             {
                 _hookID = SetHook(_proc);
                 isMacroRunning = true;
-                StartMacroButton.Content = "Stop Macro";
+                StartMacroButton.Content = "إيقاف الماكرو";
             }
             else
             {
@@ -180,7 +184,7 @@ namespace MacroMR
 
             Dispatcher.Invoke(() =>
             {
-                StartMacroButton.Content = "Start Macro";
+                StartMacroButton.Content = "بدء الماكرو";
             });
         }
 
@@ -393,6 +397,83 @@ namespace MacroMR
             }
         }
 
+        private async void CheckForUpdates_Click(object sender, RoutedEventArgs e)
+        {
+            await CheckForUpdates(true); // Manual check
+        }
+
+        private async Task CheckForUpdates(bool manualCheck = false)
+        {
+            // IMPORTANT: Replace these with your GitHub username and repository name.
+            string githubOwner = "AbdullahALAmoudi20";
+            string githubRepo = "MacroMR";
+
+            string url = $"https://api.github.com/repos/{githubOwner}/{githubRepo}/releases/latest";
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    // GitHub API requires a User-Agent header.
+                    client.DefaultRequestHeaders.Add("User-Agent", "MacroMR-UpdateRequest");
+
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        if (manualCheck)
+                        {
+                            MessageBox.Show($"تعذر استرداد معلومات التحديث. يرجى التحقق من اتصالك بالإنترنت أو تفاصيل مستودع GitHub.", "فشل التحقق من وجود تحديثات", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        }
+                        return;
+                    }
+
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                    // Use Regex to parse the JSON response to avoid dependency issues.
+                    string tagPattern = "\"tag_name\":\\s*\"(.*?)\"";
+                    string urlPattern = "\"html_url\":\\s*\"(.*?)\"";
+
+                    Match tagMatch = Regex.Match(jsonResponse, tagPattern);
+                    Match urlMatch = Regex.Match(jsonResponse, urlPattern);
+
+                    if (tagMatch.Success && urlMatch.Success)
+                    {
+                        string latestVersionStr = tagMatch.Groups[1].Value.TrimStart('v', 'V');
+                        string releaseUrl = urlMatch.Groups[1].Value;
+
+                        if (Version.TryParse(latestVersionStr, out Version latestVersion))
+                        {
+                            Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+                            if (latestVersion > currentVersion)
+                            {
+                                var result = MessageBox.Show($"إصدار جديد ({latestVersion}) متاح. أنت تستخدم الإصدار {currentVersion}.\n\nهل ترغب في الانتقال إلى صفحة التنزيل؟", "تحديث متوفر", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                                if (result == MessageBoxResult.Yes)
+                                {
+                                    Process.Start(new ProcessStartInfo(releaseUrl) { UseShellExecute = true });
+                                }
+                            }
+                            else if (manualCheck)
+                            {
+                                MessageBox.Show("أنت تستخدم أحدث إصدار.", "مُحدَّث", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                        }
+                    }
+                    else if (manualCheck)
+                    {
+                        MessageBox.Show($"تعذر تحليل معلومات التحديث من GitHub.", "فشل التحقق من وجود تحديثات", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (manualCheck)
+                {
+                    MessageBox.Show($"حدث خطأ أثناء التحقق من وجود تحديثات: {ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
         private void OpenSettings_Click(object sender, RoutedEventArgs e)
         {
             HomePanel.Visibility = Visibility.Hidden;
@@ -462,5 +543,4 @@ namespace MacroMR
         }
     }
 }
-
 
